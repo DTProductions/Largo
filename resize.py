@@ -1,37 +1,59 @@
 import cv2
 
-def crop_measures(img, horizontal_lines, vertical_lines):
-    cropped_measures = []
 
-    height, width = img.shape[:2]
+def crop_horizontal_lines(img, horizontal_lines):
+    cropped_images = []
+
+    height, _ = img.shape[:2]
 
     horizontal_lines = [0] + horizontal_lines + [height]
-    vertical_lines = [0] + vertical_lines + [width]
 
     for i, horizontal_line in enumerate(horizontal_lines):
+
         if i == len(horizontal_lines) - 1:
             continue
 
         y_start = horizontal_line
         y_end = horizontal_lines[i + 1]
 
-        for j, vertical_line in enumerate(vertical_lines):
-            if j == len(vertical_lines) - 1:
-                continue
-
-            x_start = vertical_line
-            x_end = vertical_lines[j + 1]
-            
-            cropped_measure = img[y_start:y_end, x_start:x_end]
-            cropped_measures.append(cropped_measure)
+        cropped_image = img[y_start:y_end, :]
+        cropped_images.append(cropped_image)            
     
-    return cropped_measures
+    return cropped_images
+
+def crop_vertical_lines(img, vertical_lines):
+    cropped_images = []
+
+    _, width = img.shape[:2]
+
+    vertical_lines = [0] + vertical_lines + [width]
+
+    for i, vertical_line in enumerate(vertical_lines):
+
+        if i == len(vertical_lines) - 1:
+            continue
+
+        x_start = vertical_line
+        x_end = vertical_lines[i + 1]
+
+        cropped_image = img[:, x_start:x_end]
+        cropped_images.append(cropped_image)            
+    
+    return cropped_images
 
 
 img = cv2.imread("image.png")
-measures = crop_measures(img, [50,100], [300, 450])
 
 resize_factor = 1
+
+horizontal_crops = crop_horizontal_lines(img, [50, 100])
+
+measures = []
+measures += crop_vertical_lines(horizontal_crops[0], [300, 450])
+measures += crop_vertical_lines(horizontal_crops[1], [300, 450])
+measures += crop_vertical_lines(horizontal_crops[2], [300, 550])
+
+print(len(measures))
 
 for i, measure in enumerate(measures):
     resized_measure = cv2.resize(measure, None, fx=resize_factor, fy=resize_factor)
