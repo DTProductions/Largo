@@ -21,6 +21,7 @@ def crop_horizontal_lines(img, horizontal_lines):
     
     return cropped_images
 
+
 def crop_vertical_lines(img, vertical_lines):
     cropped_images = []
 
@@ -42,9 +43,16 @@ def crop_vertical_lines(img, vertical_lines):
     return cropped_images
 
 
-img = cv2.imread("image.png")
+def resize_images(imgs, factor):
+    resized_images = []
+    for img in imgs:
+        resized_image = cv2.resize(img, None, fx=factor, fy=factor)
+        resized_images.append(resized_image)
 
-resize_factor = 1
+    return resized_images
+
+
+img = cv2.imread("image.png")
 
 horizontal_crops = crop_horizontal_lines(img, [50, 100])
 
@@ -55,9 +63,10 @@ measures += crop_vertical_lines(horizontal_crops[2], [300, 550])
 
 print(len(measures))
 
-for i, measure in enumerate(measures):
-    resized_measure = cv2.resize(measure, None, fx=resize_factor, fy=resize_factor)
-    cv2.imshow(f"image {i}", resized_measure)
+resized_measures = resize_images(measures, 1.25)
+
+for i, measure in enumerate(resized_measures):
+    cv2.imshow(f"image {i}", measure)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
